@@ -22,6 +22,7 @@ public class JiraUtils {
     private String username;
     private String apiToken;
     private String projectKey;
+    private String issueType;
 
     public JiraUtils() {
         // Read from System properties (which can be loaded from .properties by the consumer)
@@ -29,6 +30,7 @@ public class JiraUtils {
         this.username = System.getProperty("jira.username");
         this.apiToken = System.getProperty("jira.api.token");
         this.projectKey = System.getProperty("jira.project.key");
+        this.issueType = System.getProperty("jira.issue.type", "Task"); // Default to Task
 
         if (jiraUrl != null) {
             RestAssured.baseURI = jiraUrl;
@@ -55,7 +57,7 @@ public class JiraUtils {
         project.put("key", projectKey);
 
         Map<String, Object> issuetype = new HashMap<>();
-        issuetype.put("name", "Bug");
+        issuetype.put("name", issueType);
 
         Map<String, Object> fields = new HashMap<>();
         fields.put("project", project);

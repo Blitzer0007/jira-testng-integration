@@ -51,6 +51,7 @@ jira.url=https://yourcompany.atlassian.net
 jira.username=your-email@company.com
 jira.api.token=YOUR_API_TOKEN
 jira.project.key=PROJ
+jira.issue.type=Task
 ```
 
 ### Step D: Register the Listener
