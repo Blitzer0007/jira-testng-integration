@@ -6,7 +6,9 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="jira-testng-integration" />
+        <module name="jira-core" />
+        <module name="jira-cucumber-plugin" />
+        <module name="jira-testng-listener" />
       </profile>
     </annotationProcessing>
   </component>

@@ -16,6 +16,16 @@ This library is split into three core modules:
 
 ---
 
+## 📦 How GitHub Packages Works (The "Big Picture")
+
+Instead of every automation framework locally copy-pasting code to talk to Jira, we use **GitHub Packages** as our cloud artifact repository.
+1. In this **Universal Jira Library**, we defined a `<distributionManagement>` block in the `pom.xml`. 
+2. When we use our personal GitHub Token (in `settings.xml`) and run the Maven **`deploy`** command, Maven uploads our compiled Java code directly to this GitHub repository.
+3. GitHub automatically converts this code into a cloud-hosted Maven `<dependency>`.
+4. Now, any other automation team—completely independent of what framework they use—can simply add the dependency to their own `pom.xml`. Whenever they run a test, their Maven reaches out to GitHub (using their own token) and downloads the Jira logic behind the scenes!
+
+---
+
 ## 🌎 1. How to Publish to GitHub Packages
 
 Before anyone can download this library, it must be deployed (published) to GitHub Packages.
@@ -143,10 +153,13 @@ jira.issue.type=Task
 ```
 
 ### Step E: Register the Listener
-**For TestNG:** Register the Jira listener in the consumer's `testng.xml`:
+**For TestNG:** Register the listeners in the consumer's `testng.xml`. Make sure any reporting listeners that take screenshots run *before* the Jira listener!
 ```xml
 <listeners>
-    <listener class-name="com.automation.jira.testng.JiraTestListener"/>
+        <!-- Our local Extent Report Listener (takes screenshot first) -->
+        <listener class-name="com.automation.listeners.TestListener"/>
+        <!-- The remote Jira Listener (reads screenshot path and uploads) -->
+        <listener class-name="com.automation.jira.testng.JiraTestListener"/>
 </listeners>
 ```
 
