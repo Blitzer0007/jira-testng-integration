@@ -121,4 +121,27 @@ public class JiraUtils {
             log.error(response.asPrettyString());
         }
     }
+
+    /**
+     * Adds a text comment to an existing Jira issue.
+     */
+    public void addCommentToIssue(String issueKey, String commentBody) {
+        if (issueKey == null || commentBody == null) return;
+
+        Map<String, String> payload = new HashMap<>();
+        payload.put("body", commentBody);
+
+        Response response = RestAssured.given()
+                .auth().preemptive().basic(getUsername(), getApiToken())
+                .contentType(ContentType.JSON)
+                .body(payload)
+                .post("/rest/api/2/issue/" + issueKey + "/comment");
+
+        if (response.statusCode() == 201) {
+            log.info("Comment added successfully to issue {}!", issueKey);
+        } else {
+            log.error("Failed to add comment. Response code: {}", response.statusCode());
+            log.error(response.asPrettyString());
+        }
+    }
 }

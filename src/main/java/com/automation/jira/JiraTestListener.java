@@ -47,10 +47,32 @@ public class JiraTestListener implements ITestListener {
             System.out.println("✅ ============================================\n");
 
             String screenshotPath = (String) result.getAttribute("screenshot_path");
-            if (screenshotPath != null) {
-                jiraUtils.attachScreenshotToIssue(issueKey, screenshotPath);
+            if (screenshotPath != null && !screenshotPath.trim().isEmpty()) {
+                String commentBody = description + "\n\n*Attachments:*";
+
+                // Loop through comma-separated file paths
+                for (String path : screenshotPath.split(",")) {
+                    String cleanPath = path.trim();
+                    if (cleanPath.isEmpty()) continue;
+
+                    // 1. Upload each attachment to the issue
+                    jiraUtils.attachScreenshotToIssue(issueKey, cleanPath);
+
+                    // 2. Format the comment body depending on file type
+                    java.io.File file = new java.io.File(cleanPath);
+                    if (file.getName().toLowerCase().endsWith(".png") || file.getName().toLowerCase().endsWith(".jpg")) {
+                        commentBody += "\n!" + file.getName() + "!"; // Inline image
+                    } else {
+                        commentBody += "\n[^" + file.getName() + "]"; // Clickable download link
+                    }
+                }
+
+                // Post the final comment with all attachment references
+                jiraUtils.addCommentToIssue(issueKey, commentBody);
+
             } else {
-                log.info("No screenshot path found in ITestResult. Skipping attachment upload.");
+                // Fallback if there is no screenshot
+                jiraUtils.addCommentToIssue(issueKey, description);
             }
         }
     }
