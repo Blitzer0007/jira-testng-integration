@@ -42,6 +42,10 @@ public class JiraTestListener implements ITestListener {
 
         // 2. Upload screenshot (if the consumer provided one)
         if (issueKey != null) {
+            System.out.println("\n✅ ============================================");
+            System.out.println("✅ JIRA TASK CREATED: " + issueKey);
+            System.out.println("✅ ============================================\n");
+
             String screenshotPath = (String) result.getAttribute("screenshot_path");
             if (screenshotPath != null) {
                 jiraUtils.attachScreenshotToIssue(issueKey, screenshotPath);

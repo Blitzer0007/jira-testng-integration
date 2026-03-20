@@ -25,20 +25,25 @@ public class JiraUtils {
     private String issueType;
 
     public JiraUtils() {
-        // Read from System properties (which can be loaded from .properties by the consumer)
-        this.jiraUrl = System.getProperty("jira.url");
-        this.username = System.getProperty("jira.username");
-        this.apiToken = System.getProperty("jira.api.token");
-        this.projectKey = System.getProperty("jira.project.key");
-        this.issueType = System.getProperty("jira.issue.type", "Task"); // Default to Task
-
-        if (jiraUrl != null) {
-            RestAssured.baseURI = jiraUrl;
-        }
+        // We do not load system properties in the constructor anymore.
+        // TestNG instantiates listener classes very early in the lifecycle,
+        // often before the consumer's @BeforeSuite has had a chance to set System Properties.
     }
 
+    private String getJiraUrl() {
+        String url = System.getProperty("jira.url");
+        if (url != null && url.endsWith("/")) {
+            return url.substring(0, url.length() - 1);
+        }
+        return url;
+    }
+    private String getUsername() { return System.getProperty("jira.username"); }
+    private String getApiToken() { return System.getProperty("jira.api.token"); }
+    private String getProjectKey() { return System.getProperty("jira.project.key"); }
+    private String getIssueType() { return System.getProperty("jira.issue.type", "Task"); }
+
     public boolean isConfigured() {
-        return jiraUrl != null && username != null && apiToken != null && projectKey != null;
+        return getJiraUrl() != null && getUsername() != null && getApiToken() != null && getProjectKey() != null;
     }
 
     /**
@@ -51,13 +56,17 @@ public class JiraUtils {
             return null;
         }
 
-        log.info("Creating Jira Bug in project: {}...", projectKey);
+        log.info("Creating Jira Bug in project: {}...", getProjectKey());
+
+        if (getJiraUrl() != null) {
+            RestAssured.baseURI = getJiraUrl();
+        }
 
         Map<String, Object> project = new HashMap<>();
-        project.put("key", projectKey);
+        project.put("key", getProjectKey());
 
         Map<String, Object> issuetype = new HashMap<>();
-        issuetype.put("name", issueType);
+        issuetype.put("name", getIssueType());
 
         Map<String, Object> fields = new HashMap<>();
         fields.put("project", project);
@@ -69,7 +78,7 @@ public class JiraUtils {
         payload.put("fields", fields);
 
         Response response = RestAssured.given()
-                .auth().preemptive().basic(username, apiToken)
+                .auth().preemptive().basic(getUsername(), getApiToken())
                 .contentType(ContentType.JSON)
                 .body(payload)
                 .post("/rest/api/2/issue");
@@ -100,7 +109,7 @@ public class JiraUtils {
         log.info("Uploading screenshot to issue {}...", issueKey);
 
         Response response = RestAssured.given()
-                .auth().preemptive().basic(username, apiToken)
+                .auth().preemptive().basic(getUsername(), getApiToken())
                 .header("X-Atlassian-Token", "no-check")
                 .multiPart("file", file)
                 .post("/rest/api/2/issue/" + issueKey + "/attachments");
