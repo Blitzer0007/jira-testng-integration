@@ -11,57 +11,96 @@
       GitHub Packages requires the groupId to match the repository owner for Maven.
     -->
     <groupId>com.github.Blitzer0007</groupId>
-    <artifactId>jira-testng-integration</artifactId>
-    <version>1.0.0</version>
-    <packaging>jar</packaging>
+    <artifactId>jira-integration-parent</artifactId>
+    <version>1.2.0</version>
+    <packaging>pom</packaging>
 
-    <name>Jira TestNG Integration</name>
-    <description>A TestNG listener library to auto-create bugs and upload screenshots to Jira on failure</description>
+    <name>Jira Integration Parent</name>
+    <description>Parent POM for Jira TestNG and Cucumber Listeners</description>
+
+    <modules>
+        <module>jira-core</module>
+        <module>jira-testng-listener</module>
+        <module>jira-cucumber-plugin</module>
+    </modules>
 
     <properties>
         <java.version>11</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        
+        <rest.assured.version>5.4.0</rest.assured.version>
+        <jackson.version>2.16.1</jackson.version>
+        <slf4j.version>2.0.12</slf4j.version>
+        <testng.version>7.10.2</testng.version>
+        <cucumber.version>7.15.0</cucumber.version>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <!-- Core module dependency -->
+            <dependency>
+                <groupId>com.github.Blitzer0007</groupId>
+                <artifactId>jira-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
-    <dependencies>
+            <!-- REST Assured -->
+            <dependency>
+                <groupId>io.rest-assured</groupId>
+                <artifactId>rest-assured</artifactId>
+                <version>${rest.assured.version}</version>
+            </dependency>
 
-        <!-- TestNG provided scope (so consumer dictates TestNG version) -->
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>7.10.2</version>
-            <scope>provided</scope>
-        </dependency>
+            <!-- Jackson -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
 
-        <!-- REST Assured for Jira API calls -->
-        <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <version>5.4.0</version>
-        </dependency>
+            <!-- SLF4J -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            
+            <!-- TestNG -->
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>${testng.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            
+            <!-- Cucumber -->
+            <dependency>
+                <groupId>io.cucumber</groupId>
+                <artifactId>cucumber-java</artifactId>
+                <version>${cucumber.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.cucumber</groupId>
+                <artifactId>cucumber-core</artifactId>
+                <version>${cucumber.version}</version>
+                <scope>provided</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
-        <!-- Jackson for JSON serialization -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.16.1</version>
-        </dependency>
-
-        <!-- SLF4J Logging -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>2.0.12</version>
-        </dependency>
-
-    </dependencies>
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/Blitzer0007/jira-testng-integration</url>
+        </repository>
+    </distributionManagement>
 
     <build>
         <plugins>
-            <!-- Compiler plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -73,5 +112,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
